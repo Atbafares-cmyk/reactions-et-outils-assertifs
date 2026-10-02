@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#101010">
+<meta name="color-scheme" content="dark light">
+<title>Quelle réaction, quel outil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+/* Thème appliqué avant le rendu pour éviter tout flash. Le choix est partagé entre les jeux 23 MindSet. */
+(function () {
+  var t = null;
+  try { t = localStorage.getItem("23mindset-theme"); } catch (e) {}
+  if (t !== "light" && t !== "dark") {
+    t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark";
+  }
+  document.documentElement.setAttribute("data-theme", t);
+})();
+</script>
+<style>
+:root {
+  --bg: #101010;
+  --surface: #1b1b1b;
+  --surface2: #262626;
+  --text: #f4f0ee;
+  --muted: #a9a29f;
+  --line: #3a3a3a;
+  --brand: #E25667;
+  --brand-text: #EE7080;
+  --on-brand: #101010;
+  --ok: #4CC38A;
+  --ko: #FF7C7C;
+  --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  --ring: rgba(226, 86, 103, .55);
+}
+:root[data-theme="light"] {
+  --bg: #FAF6F4;
+  --surface: #FFFFFF;
+  --surface2: #F1EAE7;
+  --text: #101010;
+  --muted: #5E5755;
+  --line: #DCD1CD;
+  --brand: #E25667;
+  --brand-text: #B02A41;
+  --on-brand: #101010;
+  --ok: #1E8A57;
+  --ko: #C23636;
+  --shadow: 0 10px 28px rgba(60, 30, 30, .14);
+  --ring: rgba(176, 42, 65, .4);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  transition: background .25s, color .25s;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
+
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+}
+.top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(12px + env(safe-area-inset-top)) 0 8px;
+}
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: .02em; font-size: .95rem; }
+.brand .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--brand); display: inline-block; }
+.theme-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--line);
+  display: grid; place-items: center;
+}
+.theme-btn svg { width: 22px; height: 22px; }
+.theme-btn .sun { display: none; }
+:root[data-theme="dark"] .theme-btn .sun { display: block; }
+:root[data-theme="dark"] .theme-btn .moon { display: none; }
+
+main { flex: 1; display: flex; flex-direction: column; }
+.foot { text-align: center; color: var(--muted); font-size: .78rem; padding: 10px 0 calc(14px + env(safe-area-inset-bottom)); }
+
+/* Écran d'intro */
+.intro { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 8px 0 12px; }
+.kicker { color: var(--brand-text); font-weight: 700; font-size: .82rem; letter-spacing: .12em; text-transform: uppercase; }
+h1 { font-size: clamp(1.9rem, 7vw, 2.6rem); line-height: 1.08; margin: 0; letter-spacing: -.01em; }
+.lead { font-size: 1.08rem; margin: 0; }
+.meta { color: var(--muted); font-size: .9rem; margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line);
+  font-weight: 500; font-size: .92rem;
+}
+.chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--c, var(--brand)); display: inline-block; }
+.note {
+  border: 2px solid var(--text); border-radius: 14px; padding: 12px 14px;
+  font-size: .9rem; background: var(--surface);
+}
+.note b { display: block; margin-bottom: 2px; }
+.btn {
+  min-height: 52px; padding: 0 22px; border-radius: 14px; border: 0;
+  background: var(--brand); color: var(--on-brand); font-weight: 700; font-size: 1.05rem;
+  box-shadow: 0 6px 18px rgba(226, 86, 103, .28);
+  transition: transform .12s;
+}
+.btn:active { transform: scale(.98); }
+.btn.ghost { background: transparent; color: var(--text); border: 2px solid var(--line); box-shadow: none; }
+
+/* Appariement */
+.hud { display: flex; align-items: center; gap: 12px; padding: 4px 0 2px; }
+.progress { flex: 1; height: 8px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.progress .bar { height: 100%; width: 0; background: var(--brand); border-radius: 999px; transition: width .35s; }
+.count { font-size: .88rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.status {
+  display: flex; gap: 10px; align-items: flex-start;
+  min-height: 112px; margin: 8px 0 10px; padding: 10px 12px;
+  background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--line);
+  border-radius: 14px; font-size: .93rem; line-height: 1.35;
+}
+.status.ok { border-left-color: var(--ok); }
+.status.ko { border-left-color: var(--ko); }
+.status svg { width: 22px; height: 22px; flex: none; margin-top: 1px; }
+.status.ok svg { color: var(--ok); }
+.status.ko svg { color: var(--ko); }
+.status.idle svg { color: var(--muted); }
+.status .msg { flex: 1; }
+.status .msg b { display: block; }
+.status.ok .msg b { color: var(--ok); }
+.status.ko .msg b { color: var(--ko); }
+.status .btn { min-height: 44px; margin-top: 8px; font-size: 1rem; }
+
+.board { position: relative; display: grid; grid-template-columns: 1fr 34% ; column-gap: 36px; padding-bottom: 8px; flex: 1; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+.col.tools { gap: 8px; }
+.lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
+.lines path { fill: none; stroke-width: 3; stroke-linecap: round; }
+.lines path.good { stroke: var(--ok); }
+.lines path.bad { stroke: var(--ko); stroke-dasharray: 5 5; }
+.lines path.temp { stroke: var(--brand); stroke-dasharray: 2 6; }
+
+.reply {
+  position: relative; min-height: 52px; padding: 9px 12px; text-align: left;
+  background: var(--surface); border: 2px solid var(--line); border-radius: 14px;
+  font-size: .9rem; line-height: 1.25; font-weight: 500;
+  touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab;
+  display: flex; align-items: center; gap: 8px; flex: 1;
+  transition: border-color .15s, background .15s, transform .12s, opacity .2s;
+}
+.reply.sel { border-color: var(--brand); background: var(--surface2); box-shadow: 0 0 0 3px var(--ring); }
+.reply.done { cursor: default; opacity: .78; border-color: var(--c, var(--ok)); border-left-width: 6px; }
+.reply.done::after {
+  content: ""; width: 18px; height: 18px; flex: none; margin-left: auto; border-radius: 50%;
+  background: var(--ok) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23101010' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6 12.5l4 4 8-9'/></svg>") center/12px no-repeat;
+}
+.reply.shake { animation: shake .4s; border-color: var(--ko); }
+@keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+
+.tool {
+  flex: 1; min-height: 96px; padding: 10px 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center;
+  background: var(--surface); border: 2px solid var(--line); border-top: 5px solid var(--c);
+  border-radius: 16px; transition: background .15s, border-color .15s, transform .12s;
+}
+.tool .ico { width: 36px; height: 36px; color: var(--c); }
+.tool .ico svg { width: 100%; height: 100%; display: block; }
+.tool .lbl { font-weight: 700; font-size: .92rem; line-height: 1.15; }
+.tool .slots { display: flex; gap: 5px; margin-top: 2px; }
+.tool .slots i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--c); display: inline-block; }
+.tool .slots i.on { background: var(--c); }
+.tool.hover { background: var(--surface2); border-color: var(--c); transform: scale(1.03); }
+.tool.full { opacity: .75; }
+
+.toolkit { display: flex; flex-direction: column; gap: 10px; }
+.tk { border: 1px solid var(--line); border-left: 6px solid var(--c); border-radius: 14px; padding: 12px 14px; background: var(--surface2); }
+.tk .n { font-weight: 700; margin: 0; }
+.tk .r { color: var(--muted); font-size: .85rem; margin: 0 0 6px; }
+.tk ul { margin: 6px 0 0; padding-left: 18px; font-size: .92rem; }
+.tk .p { margin: 6px 0 0; font-size: .95rem; font-weight: 500; }
+@media (max-width: 370px) {
+  .board { column-gap: 30px; grid-template-columns: 1fr 36%; }
+  .reply { font-size: .84rem; padding: 8px 9px; }
+  .tool .lbl { font-size: .86rem; }
+}
+.fab { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg) 70%, transparent); }
+.fab .btn { display: block; width: 100%; max-width: 688px; margin: 0 auto; }
+.has-fab .app { padding-bottom: 84px; }
+/* Résultat */
+.result { flex: 1; display: flex; flex-direction: column; gap: 18px; padding: 8px 0 16px; }
+.score-wrap { display: flex; align-items: center; gap: 18px; }
+.ring { width: 118px; height: 118px; flex: none; position: relative; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .track { stroke: var(--surface2); }
+.ring .val { stroke: var(--brand); transition: stroke-dashoffset .9s cubic-bezier(.2, .8, .2, 1); }
+.ring .num { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 700; font-size: 1.7rem; font-variant-numeric: tabular-nums; }
+.score-msg h2 { margin: 0 0 4px; font-size: 1.4rem; line-height: 1.15; }
+.score-msg p { margin: 0; color: var(--muted); }
+.block { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; }
+.block h3 { margin: 0 0 8px; font-size: 1.05rem; }
+.recap { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.recap li { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: var(--surface2); font-size: .95rem; }
+.recap svg { width: 20px; height: 20px; flex: none; margin-top: 2px; }
+.recap li.ok svg { color: var(--ok); }
+.recap li.ko svg { color: var(--ko); }
+.recap .small { display: block; font-size: .82rem; color: var(--muted); margin-top: 2px; }
+.debate p { margin: 6px 0; }
+.debate ul { margin: 6px 0 10px; padding-left: 20px; }
+.debate .q { font-weight: 700; }
+.reveal { display: none; margin-top: 10px; padding: 10px 12px; border-left: 4px solid var(--brand); background: var(--surface2); border-radius: 0 12px 12px 0; }
+.reveal.show { display: block; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.closing { font-size: .95rem; color: var(--muted); margin: 0; }
+
+@media (min-width: 560px) {
+  .zone .sub { font-size: .82rem; }
+  .card { font-size: 1.5rem; min-height: 180px; }
+}
+@media (max-width: 370px) {
+  .zones.z3 .zone .sub { display: none; }
+  .zones.z3 .zone { min-height: 84px; }
+  .card { font-size: 1.18rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><span class="dot" aria-hidden="true"></span><span>23 MindSet</span></div>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Basculer entre le mode clair et le mode sombre" title="Mode clair / sombre">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </header>
+  <main id="screen" aria-live="polite"></main>
+  <div class="foot">Vos réponses ne sont pas enregistrées. Ce jeu fonctionne sans compte.</div>
+</div>
+
+<script>
+function ic(inner) {
+  return '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + inner + '</svg>';
+}
+var GAME = {
+  kicker: "Dire non sans culpabilité · Jeu d’appariement",
+  title: "Quelle réaction, quel outil ?",
+  consigne: "Huit répliques d’insistance à associer au bon outil. Touchez une réplique puis l’outil qui lui répond, ou glissez-la vers l’outil. Chaque outil répond à deux répliques. La correction est immédiate.",
+  meta: "8 répliques · 4 outils · environ 8 minutes",
+  idle: "Touchez une réplique, puis l’outil qui lui répond. Vous pouvez aussi la glisser vers l’outil.",
+  kitTitle: "Votre boîte à outils",
+  tools: [
+    { id: "disque", label: "Le disque rayé", color: "#D9731A",
+      reaction: "Contre l’insistance : répéter, calmement",
+      attack: "Phrases d’attaque",
+      phrases: ["« Je comprends, et ma réponse est la même : je ne peux pas prendre ce dossier cette semaine. »", "« Qu’est-ce qui te gêne précisément dans ce que je propose ? »"],
+      icon: ic('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="5"/><circle cx="24" cy="24" r="1.2" fill="currentColor"/><path d="M11.5 24A12.5 12.5 0 0 1 24 11.5" opacity=".6"/>') },
+    { id: "edredon", label: "L’édredon", color: "#5FA08C",
+      reaction: "Contre la culpabilisation : absorber sans céder",
+      attack: "Trois phrases, selon ce que l’autre avance",
+      phrases: ["Un fait : « c’est vrai. »", "Une opinion : « c’est ton avis. » ou « c’est possible. »", "Une émotion : « je comprends que ça t’agace. »"],
+      icon: ic('<rect x="8" y="12" width="32" height="24" rx="9"/><path d="M8 24H40M24 12V36" opacity=".5"/>') },
+    { id: "enquete", label: "L’enquête négative", color: "#6C8EBF",
+      reaction: "Contre la critique vague : faire préciser",
+      attack: "Phrases d’attaque",
+      phrases: ["« Qu’est-ce qui te fait dire ça ? »", "« Peux-tu me donner un exemple précis ? »", "« Qu’est-ce qui, exactement, ne va pas pour toi ? »"],
+      icon: ic('<circle cx="21" cy="21" r="11"/><path d="M29.5 29.5L41 41"/>') },
+    { id: "escalade", label: "La séquence d’escalade", color: "#A489C4",
+      reaction: "Contre la pression : trois marches",
+      attack: "Les trois marches",
+      phrases: ["Je tiens : je répète ma position, une fois, sans ajouter de raison.", "Je m’exprime : « Là, j’ai l’impression qu’on me met devant le fait accompli. »", "J’absorbe : « Je comprends. Ma réponse reste la même, et je te propose qu’on en reparle demain. »"],
+      icon: ic('<path d="M6 40H16V30H26V20H36V10H44"/>') }
+  ],
+  pairs: [
+    { t: "Allez, juste cette fois.", tool: "disque",
+      why: "C’est de l’insistance : on répète la demande pour user l’autre. Réponse : le disque rayé, répéter calmement la même phrase, sans varier." },
+    { t: "Fais un effort, ça ne prendra pas longtemps.", tool: "disque",
+      why: "Encore de l’insistance : on minimise pour obtenir un oui. Le disque rayé revient aux faits, sans se justifier davantage." },
+
+    { t: "Je pensais pouvoir compter sur toi.", tool: "edredon",
+      why: "C’est de la culpabilisation : elle joue sur le lien et la loyauté. Réponse : l’édredon, absorber sans céder. Comprendre n’est pas être d’accord." },
+    { t: "Les autres le font bien, eux.", tool: "edredon",
+      why: "Une comparaison qui culpabilise. C’est une opinion : l’édredon répond « c’est possible », sans céder." },
+
+    { t: "Tu n’es jamais disponible.", tool: "enquete",
+      why: "Critique vague : « jamais » ne se réfute pas. On la précise avec l’enquête négative : « peux-tu me donner un exemple précis ? »" },
+    { t: "Tu compliques tout.", tool: "enquete",
+      why: "Critique vague, impossible à réfuter en l’état. On la fait préciser, et souvent elle se dégonfle." },
+
+    { t: "Je vais devoir remonter que ce n’est pas possible.", tool: "escalade",
+      why: "Pression implicite : une conséquence laissée dans l’air. Réponse : la séquence d’escalade, je tiens, je m’exprime, j’absorbe." },
+    { t: "On en reparlera à l’entretien annuel.", tool: "escalade",
+      why: "Pression implicite : on laisse entendre un enjeu sans le dire. On applique la séquence d’escalade, en commençant par tenir sa position." }
+  ],
+  bands: [
+    { min: 8, title: "Sans faute", text: "Vous reconnaissez la réaction avant de choisir l’outil." },
+    { min: 6, title: "Bon réflexe", text: "Quelques hésitations : revoyez les réactions listées ci-dessous." },
+    { min: 0, title: "Un point de départ", text: "Ce jeu sert à créer l’automatisme. Rejouez-le, il est court." }
+  ],
+  closing: "Chaque réaction a son outil. Vous n’improvisez pas, vous reconnaissez et vous appliquez."
+};
+
+</script>
+<script>
+(function () {
+  "use strict";
+  var G = GAME;
+  var $ = function (s) { return document.querySelector(s); };
+  var screen = $("#screen");
+  var tools = {};
+  G.tools.forEach(function (t) { tools[t.id] = t; });
+
+  var ICON_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>';
+  var ICON_KO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7"/></svg>';
+  var ICON_IDLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 11v5M12 7.6v.2"/></svg>';
+
+  var items = [], selected = null, matched = 0, errors = 0, busy = false, links = [];
+
+  /* ---------- Thème ---------- */
+  function setTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute("content", t === "light" ? "#FAF6F4" : "#101010");
+    try { localStorage.setItem("23mindset-theme", t); } catch (e) {}
+  }
+  $("#themeBtn").addEventListener("click", function () {
+    setTheme(document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light");
+  });
+  setTheme(document.documentElement.getAttribute("data-theme"));
+
+  /* ---------- Outils ---------- */
+  function esc(s) {
+    return String(s).replace(/« /g, "«\u00A0").replace(/ »/g, "\u00A0»").replace(/ ([?:!;])/g, "\u00A0$1").replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+  function qt(t) { return "« " + t + " »"; }
+  function shuffle(a) {
+    var r = a.slice();
+    for (var i = r.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = r[i]; r[i] = r[j]; r[j] = t;
+    }
+    return r;
+  }
+
+  /* ---------- Intro ---------- */
+  function renderIntro() {
+    var chips = G.tools.map(function (t) {
+      return '<span class="chip" style="--c:' + t.color + '"><i></i>' + esc(t.label) + '</span>';
+    }).join("");
+    screen.innerHTML =
+      '<section class="intro">' +
+        '<div class="kicker">' + esc(G.kicker) + '</div>' +
+        '<h1>' + esc(G.title) + '</h1>' +
+        '<p class="lead">' + esc(G.consigne) + '</p>' +
+        '<div class="chips" aria-label="Les quatre outils">' + chips + '</div>' +
+        '<p class="meta">' + esc(G.meta) + '</p>' +
+        '<button class="btn" id="start" type="button">Commencer</button>' +
+      '</section>';
+    $("#start").addEventListener("click", startGame);
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Jeu ---------- */
+  function startGame() {
+    items = shuffle(G.pairs).map(function (p, i) {
+      return { id: i, t: p.t, tool: p.tool, why: p.why, done: false, first: null };
+    });
+    selected = null; matched = 0; errors = 0; busy = false; links = [];
+    removeFab();
+    renderBoard();
+  }
+
+  function setStatus(kind, title, text, extra) {
+    var st = $("#status");
+    st.className = "status " + kind;
+    var ic = kind === "ok" ? ICON_OK : kind === "ko" ? ICON_KO : ICON_IDLE;
+    st.innerHTML = ic + '<div class="msg">' + (title ? "<b>" + esc(title) + "</b>" : "") + esc(text) + (extra || "") + "</div>";
+  }
+  function removeFab() { var f = $("#fab"); if (f) f.remove(); document.body.classList.remove("has-fab"); }
+  function showFab() {
+    removeFab();
+    var f = document.createElement("div");
+    f.id = "fab"; f.className = "fab";
+    f.innerHTML = '<button class="btn" id="seeResult" type="button">Voir mon résultat</button>';
+    document.body.appendChild(f);
+    document.body.classList.add("has-fab");
+    $("#seeResult").addEventListener("click", renderResult);
+    setTimeout(function () { try { $("#seeResult").focus({ preventScroll: true }); } catch (e) {} }, 100);
+  }
+
+  function slotsHTML(t) {
+    var n = G.pairs.filter(function (p) { return p.tool === t.id; }).length;
+    var have = items.filter(function (i) { return i.done && i.tool === t.id; }).length;
+    var h = "";
+    for (var k = 0; k < n; k++) h += '<i class="' + (k < have ? "on" : "") + '"></i>';
+    return h;
+  }
+
+  function renderBoard() {
+    var total = items.length;
+    var repl = items.map(function (it) {
+      return '<button type="button" class="reply" data-i="' + it.id + '" aria-pressed="false">' + esc(qt(it.t)) + '</button>';
+    }).join("");
+    var tl = G.tools.map(function (t) {
+      return '<button type="button" class="tool" data-t="' + t.id + '" style="--c:' + t.color + '" aria-label="Relier à : ' + esc(t.label) + '">' +
+        '<span class="ico">' + t.icon + '</span><span class="lbl">' + esc(t.label) + '</span><span class="slots" data-s="' + t.id + '">' + slotsHTML(t) + '</span></button>';
+    }).join("");
+    screen.innerHTML =
+      '<div class="hud"><div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="0"><div class="bar" id="bar" style="width:0"></div></div>' +
+      '<div class="count" id="count">0 / ' + total + '</div></div>' +
+      '<div class="status idle" id="status" role="status" aria-live="polite"></div>' +
+      '<div class="board" id="board"><svg class="lines" id="lines" aria-hidden="true"></svg>' +
+      '<div class="col replies">' + repl + '</div><div class="col tools">' + tl + '</div></div>';
+    setStatus("idle", "", G.idle);
+    Array.prototype.forEach.call(document.querySelectorAll(".reply"), bindReply);
+    Array.prototype.forEach.call(document.querySelectorAll(".tool"), function (t) {
+      t.addEventListener("click", function () { tryPair(t.getAttribute("data-t")); });
+    });
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Tracé des liens ---------- */
+  function boardRect() { return $("#board").getBoundingClientRect(); }
+  function anchorReply(el) {
+    var b = boardRect(), r = el.getBoundingClientRect();
+    return { x: r.right - b.left, y: r.top + r.height / 2 - b.top };
+  }
+  function anchorTool(el) {
+    var b = boardRect(), r = el.getBoundingClientRect();
+    return { x: r.left - b.left, y: r.top + r.height / 2 - b.top };
+  }
+  function curve(a, b) {
+    var d = Math.max(20, Math.abs(b.x - a.x) / 2);
+    return "M" + a.x + " " + a.y + " C" + (a.x + d) + " " + a.y + " " + (b.x - d) + " " + b.y + " " + b.x + " " + b.y;
+  }
+  function drawLinks() {
+    var svg = $("#lines");
+    if (!svg) return;
+    var html = links.map(function (l) {
+      var a = anchorReply(document.querySelector('.reply[data-i="' + l.i + '"]'));
+      var b = anchorTool(document.querySelector('.tool[data-t="' + l.t + '"]'));
+      return '<path class="' + l.kind + '" d="' + curve(a, b) + '"' + (l.kind === "good" ? ' style="stroke:' + tools[l.t].color + '"' : "") + "/>";
+    }).join("");
+    svg.innerHTML = html;
+  }
+  window.addEventListener("resize", drawLinks);
+
+  /* ---------- Sélection et glisser ---------- */
+  function select(id) {
+    selected = id;
+    Array.prototype.forEach.call(document.querySelectorAll(".reply"), function (r) {
+      var on = Number(r.getAttribute("data-i")) === id;
+      r.classList.toggle("sel", on);
+      r.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+  function toolAt(x, y) {
+    var ts = document.querySelectorAll(".tool"), f = null;
+    for (var i = 0; i < ts.length; i++) {
+      var r = ts[i].getBoundingClientRect(), m = 8;
+      if (x >= r.left - m && x <= r.right + m && y >= r.top - m && y <= r.bottom + m) { f = ts[i]; break; }
+    }
+    return f;
+  }
+  function clearHover() {
+    Array.prototype.forEach.call(document.querySelectorAll(".tool.hover"), function (t) { t.classList.remove("hover"); });
+  }
+  function bindReply(el) {
+    var id = Number(el.getAttribute("data-i"));
+    var active = false, moved = false, sx = 0, sy = 0;
+    el.addEventListener("pointerdown", function (e) {
+      if (busy || items[id].done || (e.pointerType === "mouse" && e.button !== 0)) return;
+      active = true; moved = false; sx = e.clientX; sy = e.clientY;
+      try { el.setPointerCapture(e.pointerId); } catch (err) {}
+      select(id);
+    });
+    el.addEventListener("pointermove", function (e) {
+      if (!active) return;
+      if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
+      if (!moved) return;
+      var b = boardRect();
+      var a = anchorReply(el);
+      var svg = $("#lines");
+      var tmp = svg.querySelector("path.temp");
+      if (!tmp) { tmp = document.createElementNS("http://www.w3.org/2000/svg", "path"); tmp.setAttribute("class", "temp"); svg.appendChild(tmp); }
+      tmp.setAttribute("d", curve(a, { x: e.clientX - b.left, y: e.clientY - b.top }));
+      clearHover();
+      var t = toolAt(e.clientX, e.clientY);
+      if (t) t.classList.add("hover");
+    });
+    function end(e, cancel) {
+      if (!active) return;
+      active = false;
+      var tmp = $("#lines") && $("#lines").querySelector("path.temp");
+      if (tmp) tmp.remove();
+      clearHover();
+      if (cancel || !moved) return;
+      var t = toolAt(e.clientX, e.clientY);
+      if (t) tryPair(t.getAttribute("data-t"));
+    }
+    el.addEventListener("pointerup", function (e) { end(e, false); });
+    el.addEventListener("pointercancel", function (e) { end(e, true); });
+  }
+
+  /* ---------- Appariement ---------- */
+  function tryPair(toolId) {
+    if (busy) return;
+    if (selected === null) {
+      setStatus("idle", "", "Choisissez d’abord une réplique, puis touchez l’outil qui lui répond.");
+      return;
+    }
+    var it = items[selected];
+    var el = document.querySelector('.reply[data-i="' + it.id + '"]');
+    var ok = it.tool === toolId;
+    if (it.first === null) it.first = ok;
+    if (ok) {
+      it.done = true; matched++;
+      links.push({ i: it.id, t: toolId, kind: "good" });
+      el.classList.remove("sel");
+      el.classList.add("done");
+      el.style.setProperty("--c", tools[toolId].color);
+      el.setAttribute("aria-pressed", "false");
+      var slots = document.querySelector('.slots[data-s="' + toolId + '"]');
+      slots.innerHTML = slotsHTML(tools[toolId]);
+      var full = items.filter(function (x) { return x.done && x.tool === toolId; }).length === G.pairs.filter(function (p) { return p.tool === toolId; }).length;
+      if (full) document.querySelector('.tool[data-t="' + toolId + '"]').classList.add("full");
+      selected = null;
+      drawLinks();
+      $("#bar").style.width = (matched / items.length * 100) + "%";
+      $("#count").textContent = matched + " / " + items.length;
+      var last = matched === items.length;
+      setStatus("ok", "Bien vu", it.why);
+      if (last) showFab();
+    } else {
+      errors++;
+      busy = true;
+      links.push({ i: it.id, t: toolId, kind: "bad" });
+      drawLinks();
+      el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake");
+      setStatus("ko", "Pas cet outil", it.why);
+      setTimeout(function () {
+        links = links.filter(function (l) { return l.kind !== "bad"; });
+        drawLinks();
+        el.classList.remove("shake");
+        busy = false;
+      }, 900);
+    }
+  }
+
+  /* ---------- Résultat ---------- */
+  function renderResult() {
+    removeFab();
+    var n = items.length;
+    var score = items.filter(function (i) { return i.first; }).length;
+    var band = G.bands.filter(function (b) { return score >= b.min; })[0];
+    var R = 52, C = 2 * Math.PI * R;
+    var missed = items.filter(function (i) { return !i.first; });
+    var kit = G.tools.map(function (t) {
+      var reps = items.filter(function (i) { return i.tool === t.id; }).map(function (i) { return "<li>" + esc(qt(i.t)) + "</li>"; }).join("");
+      var ph = t.phrases.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
+      return '<div class="tk" style="--c:' + t.color + '"><p class="n">' + esc(t.label) + '</p><p class="r">' + esc(t.reaction) + '</p>' +
+        '<ul>' + reps + '</ul><p class="p">' + esc(t.attack) + '</p><ul>' + ph + '</ul></div>';
+    }).join("");
+    var miss = missed.length
+      ? '<div class="block"><h3>Les réactions à revoir</h3><ul class="recap">' + missed.map(function (i) {
+          return '<li class="ko">' + ICON_KO + '<span>' + esc(qt(i.t)) + '<span class="small">Outil attendu : ' + esc(tools[i.tool].label) + '</span></span></li>';
+        }).join("") + '</ul></div>'
+      : "";
+    screen.innerHTML =
+      '<section class="result">' +
+        '<div class="score-wrap">' +
+          '<div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="' + R + '" fill="none" stroke-width="11"/>' +
+          '<circle class="val" cx="60" cy="60" r="' + R + '" fill="none" stroke-width="11" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C + '"/></svg>' +
+          '<div class="num">' + score + ' / ' + n + '</div></div>' +
+          '<div class="score-msg"><h2>' + esc(band.title) + '</h2><p>' + esc(band.text) + '<br>Score : reliées du premier coup.</p></div>' +
+        '</div>' +
+        miss +
+        '<div class="block"><h3>' + esc(G.kitTitle) + '</h3><div class="toolkit">' + kit + '</div></div>' +
+        '<p class="closing">' + esc(G.closing) + '</p>' +
+        '<div class="actions"><button class="btn" id="again" type="button">Rejouer</button></div>' +
+      '</section>';
+    var val = document.querySelector(".ring .val");
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { val.style.strokeDashoffset = String(C * (1 - score / n)); });
+    });
+    $("#again").addEventListener("click", startGame);
+    window.scrollTo(0, 0);
+  }
+
+  renderIntro();
+})();
+</script>
+</body>
+</html>
