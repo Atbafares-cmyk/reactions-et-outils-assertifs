@@ -250,7 +250,7 @@ h1 { font-size: clamp(1.9rem, 7vw, 2.6rem); line-height: 1.08; margin: 0; letter
     </button>
   </header>
   <main id="screen" aria-live="polite"></main>
-  <div class="foot">Vos réponses ne sont pas enregistrées. Ce jeu fonctionne sans compte.</div>
+  <div class="foot"><div>Vos réponses ne sont pas enregistrées. Ce jeu fonctionne sans compte.</div><div class="copy">© <span id="yr">2026</span> 23 MindSet · Fares ATBA. Tous droits réservés.</div></div>
 </div>
 
 <script>
@@ -342,6 +342,8 @@ var GAME = {
     setTheme(document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light");
   });
   setTheme(document.documentElement.getAttribute("data-theme"));
+  var yr = document.getElementById("yr");
+  if (yr) yr.textContent = String(new Date().getFullYear());
 
   /* ---------- Outils ---------- */
   function esc(s) {
